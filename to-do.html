@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TO DO LIST | Home</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('Todo02.jpg');
+
+            background-repeat: no-repeat;
+            background-size: 100% 130%;
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 10px;
+           
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .panel-body{
+            height: 450px;
+            overflow:overflow;
+            background-color: #d5e5ff !important;
+            border: 0.5px !important;
+            box-shadow: 0px 0px 10px black;
+        }
+        .panel{
+            width: 100%;
+            border: 0.5px !important;
+        /* box-shadow: 10px 15px 15px #692301;*/
+        }
+        .panel-heading, .panel-footer{
+            background: pink !important;
+            color: black !important;
+            border: 0.5px !important;
+            box-shadow: 0px 0px 10px black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HTML & BOOTSTRAP CODE -->
+    <div class="col-lg-4">
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2>TO DO LIST</h2>
+            </div>
+            <div class="panel-body" id="print">
+                <ul class="list-group">
+                
+                </ul>
+            </div>
+            <div class="panel-footer">
+                <input type="text" id="name" placeholder="Here you can add your task !" class="form-control"
+                onkeyup="checkname(this.value)">    
+                <br />
+                <button onclick="addlist()" class="btn btn-success">Add Task</button>
+            </div>
+      
+            </div>
+        </div>
+    </div>
+    <!-- JS SCRIPT CODE -->
+
+    <script type="text/javascript">
+
+       
+        var todolist = JSON.parse(localStorage.getItem("Todolist"));
+        console.log(todolist);
+        if (todolist == null) {
+            todolist = [];
+        }
+
+        // Firstly we convert HTML data into string Then we can doing different task with this
+        // This is a function of showlist()
+        function showlist() {
+            var str = "";
+            for (var i = 0; i < todolist.length; i++) {
+                // todolist[i];
+                str += '<li class="list-group-item list-group-item-warning col-lg-12 col-md-12 col-sm-12 col-xs-12">';
+                str += "<div class='dropdown pull-right'>";
+                str += "<span data-toggle='dropdown' class='btn glyphicon glyphicon-option-vertical'></span>";
+                str += "<ul class='dropdown-menu'>";
+                str += '<li><a id="' + todolist[i].Name + '" onclick="Delete(this.id)">Delete</a></li>';
+                str += "</ul>";
+                str += "</div>";
+                if (todolist[i].Status == 0) {
+                    // unchecked
+                    str += '<button class="btn btn-warning pull-right" id = "' + todolist[i].Name + '" onclick="done(this.id)">';
+                    str += '<span class="glyphicon glyphicon-unchecked"></span>';
+                    str += '</button>';
+                    str += todolist[i].Name;
+                } else {
+                    str += '<button class="btn btn-warning pull-right" id = "' + todolist[i].Name + '" onclick="undone(this.id)" >';
+                    str += '<span class="glyphicon glyphicon-check"></span>';
+                    str += '</button>';
+                    str += '<del>';
+                    str += todolist[i].Name;
+                    str += '</del>';
+                }
+                str += '</li>';
+            }
+            document.getElementById('print').innerHTML = str;
+        }
+        showlist();
+
+        // Done and Undone & Checked & Unchecked
+        function done(x) {
+            for (var i = 0; i < todolist.length; i++) {
+                if (todolist[i].Name == x) {
+                    todolist[i].Status = 1;
+                }
+            }
+            localStorage.setItem("Todolist",JSON.stringify(todolist));
+            showlist();
+        }
+
+        function undone(x) {
+            if (window.confirm("Are you sure, you wanna uncheck: " + x)) {
+                for (var i = 0; i < todolist.length; i++) {
+                    if (todolist[i].Name == x) {
+                        todolist[i].Status = 0;
+                    }
+                }
+                localStorage.setItem("Todolist",JSON.stringify(todolist));
+                showlist();
+            }
+        }
+
+        function Delete(x){
+            if(window.confirm("Are you sure, you want to delete ? "+x)){
+                var ar = [];
+                for(var i = 0; i<todolist.length; i++){
+                    if(todolist[i].Name !=x){
+                        ar.push(todolist[i]);
+                    }
+                }
+                todolist = ar;
+                localStorage.setItem("Todolist",JSON.stringify(ar));
+                showlist();
+            }
+        }
+
+       
+        function addlist() {
+            var name = document.getElementById('name').value;
+            if (name) {
+                todolist.push({ Name: name, Status: 0 });
+                localStorage.setItem("Todolist",JSON.stringify(todolist));
+                document.getElementById('name').value = "";
+                document.getElementById('name').focus();
+                showlist();
+            } else {
+                document.getElementById('name').style.boxShadow = '0px 0px 10px #e61e10';
+                document.getElementById('name').focus();
+            }
+        }
+
+        function checkname(x) {
+            if (x) {
+                document.getElementById('name').style.boxShadow = '0px 10px 0px white';
+                          }
+            else {
+              
+                document.getElementById('name').style.boxShadow = '0px 0px 10px #ff7a7a';
+                
+            }
+        }
+
+    </script>
+</body>
+
+</html>
